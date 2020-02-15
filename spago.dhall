@@ -10,7 +10,7 @@ You can edit this file as you like.
     , "variant"
     , "nonempty"
     , "aff"
-    , "graphql"Toggle
+    , "graphql"
     , "halogen"
     , "halogen-formless"
     , "remotedata"
