@@ -124,31 +124,34 @@ let upstream =
 let overrides = {=}
 
 let additions =
-    { graphql =
-        { dependencies =
-            [ "aff"
-            , "aff-promise"
-            , "argonaut-codecs"
-            , "argonaut-core"
-            , "foldable-traversable"
-            , "nullable"
-            , "numbers"
-            , "prelude"
-            , "psci-support"
-            , "record"
-            , "spec"
-            , "string-parsers"
-            ]
-        , repo = "https://github.com/hendrikniemann/purescript-graphql.git"
-        , version = "v1.0.1"
-        }
-    , uuid =
-        { dependencies =
-            [ "effect"
-            ]
-        , repo = "https://github.com/spicydonuts/purescript-uuid"
-        , version = "v6.0.0"
-        }
-    }
+      { graphql =
+          { dependencies =
+              [ "aff"
+              , "aff-promise"
+              , "argonaut-codecs"
+              , "argonaut-core"
+              , "foldable-traversable"
+              , "nullable"
+              , "numbers"
+              , "prelude"
+              , "psci-support"
+              , "record"
+              , "spec"
+              , "string-parsers"
+              ]
+          , repo =
+              "https://github.com/hendrikniemann/purescript-graphql.git"
+          , version =
+              "v1.0.1"
+          }
+      , uuid =
+          { dependencies =
+              [ "effect" ]
+          , repo =
+              "https://github.com/spicydonuts/purescript-uuid"
+          , version =
+              "v6.0.0"
+          }
+      }
 
 in  upstream // overrides // additions

@@ -72,6 +72,29 @@ h2 {
     }
 }
 
-.bullet .scale rect {
-    opacity: 0.3;
+.bullet-container {
+    padding: 50px;
+}
+
+.bullet {
+    .scale rect {
+        opacity: 0.3;
+        fill:#999;
+    }
+    .attainment.met {
+        stroke: green;
+    }
+    .attainment.missed {
+        stroke: red;
+    }
+    .target {
+        stroke: black;
+    }
+
+    .ticks line {
+        stroke: black;
+    }
+
+    .title { font-size: 14px; font-weight: bold; }
+    .subtitle { fill: #999; }
 }

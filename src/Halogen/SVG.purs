@@ -1,5 +1,6 @@
 module Halogen.SVG where
 
+import Color (cssStringHSLA, Color)
 import DOM.HTML.Indexed (Interactive)
 import Data.Array as Array
 import Data.String (joinWith)
@@ -47,7 +48,8 @@ type SVGPresentation r
   = ( transform :: Translate | r )
 
 type SVGline
-  = ( x1 :: CSSPixel
+  = SVGCore
+    ( x1 :: CSSPixel
     , y1 :: CSSPixel
     , x2 :: CSSPixel
     , y2 :: CSSPixel
@@ -57,12 +59,15 @@ type SVGline
 
 type SVGtext
   = SVGPresentation
-      ( x :: CSSPixel
-      , y :: CSSPixel
-      , stroke :: RGB
-      , textAnchor :: Anchor
-      , transform :: Translate
-      )
+      ( SVGCore
+        ( x :: CSSPixel
+        , y :: CSSPixel
+        , dy :: String
+        , stroke :: RGB
+        , textAnchor :: Anchor
+        , transform :: Translate
+        )
+     )
 
 svgNS :: Namespace
 svgNS = Namespace "http://www.w3.org/2000/svg"
@@ -117,6 +122,9 @@ x2 = attr (AttrName "x2")
 
 y2 :: forall r i. CSSPixel -> IProp ( y2 :: CSSPixel | r ) i
 y2 = attr (AttrName "y2")
+
+dy :: forall r i. String -> IProp ( dy :: String | r ) i
+dy = attr (AttrName "dy")
 
 height :: forall r i. CSSPixel -> IProp ( height :: CSSPixel | r ) i
 height = attr (AttrName "height")
@@ -185,8 +193,14 @@ data RGB
     , b :: Int
     }
 
+
 instance isAttrRGB :: IsAttr RGB where
   toAttrValue (RGB theRGB) = "rgb" <> parens (joinWith "," (show <$> [ theRGB.r, theRGB.g, theRGB.b ]))
+
+newtype HSVA = HSVA Color
+
+instance isAttrHSVA :: IsAttr HSVA where
+  toAttrValue (HSVA c) = cssStringHSLA c
 
 rgb :: Int -> Int -> Int -> RGB
 rgb r g b = RGB { r, g, b }

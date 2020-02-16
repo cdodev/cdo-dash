@@ -173,6 +173,18 @@ let
         installPhase = "ln -s $src $out";
       };
 
+    "colors" = pkgs.stdenv.mkDerivation {
+        name = "colors";
+        version = "v5.0.0";
+        src = pkgs.fetchgit {
+          url = "https://github.com/sharkdp/purescript-colors.git";
+          rev = "fb582d3626e566371d20d4ef0b8d2795ee80f024";
+          sha256 = "05bkfqllfpkh7nj0nzgd5p387hlpk0x35nam1i6xm3vzma9csj18";
+        };
+        phases = "installPhase";
+        installPhase = "ln -s $src $out";
+      };
+
     "console" = pkgs.stdenv.mkDerivation {
         name = "console";
         version = "v4.4.0";

@@ -2,7 +2,7 @@ module Main where
 
 import Prelude
 
-import Dash.Types (ui)
+import Dash.Bullet (ui)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Effect.Unsafe (unsafePerformEffect)

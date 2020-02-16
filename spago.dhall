@@ -5,6 +5,7 @@ You can edit this file as you like.
 { name = "cdo-dash"
 , dependencies =
     [ "prelude"
+    , "colors"
     , "console"
     , "effect"
     , "variant"
