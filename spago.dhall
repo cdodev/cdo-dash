@@ -13,6 +13,7 @@ You can edit this file as you like.
     , "aff"
     , "graphql"
     , "halogen"
+    , "halogen-bootstrap4"
     , "halogen-formless"
     , "remotedata"
     , "routing"

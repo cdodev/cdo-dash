@@ -73,7 +73,10 @@ h2 {
 }
 
 .bullet-container {
-    padding: 50px;
+    padding: 15px 15px 5px 5px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 .bullet {
@@ -82,10 +85,10 @@ h2 {
         fill:#999;
     }
     .attainment.met {
-        stroke: green;
+        stroke: $g-color-primary;
     }
     .attainment.missed {
-        stroke: red;
+        stroke: #AB2A0B;
     }
     .target {
         stroke: black;

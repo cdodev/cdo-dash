@@ -1,5 +1,6 @@
-module Dash.Bullet (Slot, Query, Message, Action, State, ui, bullet) where
+module Dash.Bullet (Slot, Query, Input(..), Message, Action, State, ui, Bullet, BulletSettings, Range, initialState, defaultBullet, defaultSettings) where
 
+import Halogen.Themes.Bootstrap4
 import Control.Bind (discard)
 import Control.MonadZero (guard)
 import Data.Array ((..))
@@ -8,7 +9,6 @@ import Data.Int (round, toNumber)
 import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.Properties (class_)
 import Halogen.HTML.Properties as HP
 import Halogen.SVG (Anchor(..), RGB(..), Translate(..), dy, fill, g, height, line, rect, rgb, stroke, strokeWidth, svg, svgText, textAnchor, transform, width, x, x1, x2, y, y1, y2)
 import Halogen.SVG as SVG
@@ -26,14 +26,19 @@ data Results = R
 
 data Question
 
+data Input = InBullet (Maybe Bullet)
+
 data QType c = Scale | Binary | Category c
 
 type Range = { start :: Int, end :: Int }
 
-type Scale = { label :: Int, x :: Number }
+type Scale = { scaleLabel :: Int, x :: Number }
 
 resultToBullet :: Results -> Bullet
-resultToBullet _ = Bullet $
+resultToBullet _ = defaultBullet
+
+defaultBullet :: Bullet
+defaultBullet =
   { caption : "Purpose"
   , subCap : "What's your why?"
   , scale : [0.1, 0.65, 0.90, 1.0]
@@ -43,9 +48,8 @@ resultToBullet _ = Bullet $
   , attainment : 0.75
   }
 
-newtype Bullet
-  = Bullet
-    { caption :: String
+type Bullet
+  = { caption :: String
     , subCap :: String
     , scale :: Array Number -- 0 - 1
     , range :: Range
@@ -55,7 +59,7 @@ newtype Bullet
     }
 
 attainmentMet :: Bullet -> Boolean
-attainmentMet (Bullet b) = b.attainment >= b.target
+attainmentMet b = b.attainment >= b.target
 
 type BulletSettings
   = { bulletHeight :: Int
@@ -73,33 +77,32 @@ mapRange { start, end } n =
   in round $ (s + (e-s) * n)
 
 mkScale :: Bullet -> Array (Scale)
-mkScale (Bullet {tickSize, range }) = do
+mkScale {tickSize, range } = do
   n <- range.start..range.end
   guard $ 0 == mod n tickSize
-  pure { label: n, x: toNumber n/toNumber range.end }
+  pure { scaleLabel: n, x: toNumber n/toNumber range.end }
 
 
 defaultSettings :: BulletSettings
 defaultSettings =
   { bulletHeight : 50
-  , bulletWidth : 400
+  , bulletWidth : 500
   , bulletMargin : 5
   , scaleHeight : 0.5
   , labelWidth : 0.25
   }
 
-newtype State
-  = State
-    {
+type State
+  = {
       bullet :: Maybe Bullet
     , settings :: BulletSettings
     }
 
 
-initialState :: forall i. i -> State
-initialState _ = State { bullet : Just (resultToBullet R), settings : defaultSettings }
+initialState :: Input -> State
+initialState (InBullet b) = { bullet : b, settings : defaultSettings }
 
-ui :: forall q i o m. H.Component HH.HTML q i o m
+ui :: forall q o m. H.Component HH.HTML q Input o m
 ui =
   H.mkComponent
     { initialState
@@ -109,20 +112,20 @@ ui =
     }
 
 render :: forall m. State -> H.ComponentHTML Action () m
-render (State state) = do
-  HH.div [HP.class_ $ HH.ClassName "bullet-container"]
+render state = do
+  HH.div [HP.classes [HH.ClassName "bullet-container", col6]]
     [
       case state.bullet of
         Nothing -> HH.h1 [] [HH.text "Loading.."]
-        Just bullet@(Bullet b) ->
+        Just b ->
           let
-            label = "attainment " <> if attainmentMet bullet then "met" else "missed"
+            attainmentCls = "attainment " <> if attainmentMet b then "met" else "missed"
             tgtX = scaleToBullet b.target
-            renderScale { label, x } =
+            renderScale { scaleLabel, x } =
               let scaleX = scaleToBullet x
               in g [transform $ Translate {x: scaleX, y: scaleHeightPx}, SVG.class_ "ticks"]
                    [ line [x1 0, x2 0, y1 0, y2 4, strokeWidth 1 ] []
-                   , svgText [textAnchor Middle, dy "1em", transform $ Translate {x: 0, y: 5}] (show label)
+                   , svgText [textAnchor Middle, dy "1em", transform $ Translate {x: 0, y: 5}] (show scaleLabel)
                    ]
           in
             svg [ width (bulletWidth+(2*bulletMargin))
@@ -135,7 +138,7 @@ render (State state) = do
                     (mkRange <$> b.scale)
                      <>
                     [ line [ x1 0, y1 lineY, x2 (scaleToBullet b.attainment), y2 lineY
-                           , SVG.class_ label
+                           , SVG.class_ attainmentCls
                            , strokeWidth sw
                            ] []
                     , line [ x1 tgtX, x2 tgtX, y1 tgtY1, y2 tgtY2
@@ -149,7 +152,7 @@ render (State state) = do
                         ]
                     ]
                     <>
-                    (renderScale <$> mkScale bullet )
+                    (renderScale <$> mkScale b )
                   )
               ]
 
